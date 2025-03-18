@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/farhan-helmy/sedekahje-be/internal/models"
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -18,9 +19,13 @@ func NewInstitutionService(client *mongo.Client) *InstitutionService {
 }
 
 func (s *InstitutionService) CreateInstitution(institution models.Institution) error {
-	_, err := s.collection.InsertOne(context.Background(), institution)
+	if _, err := s.collection.InsertOne(context.Background(), institution); err != nil {
+		return err
+	}
 
-	return err
+	fmt.Println("Created institution", institution.Name)
+
+	return nil
 }
 
 func (s *InstitutionService) GetInstitutions() ([]models.Institution, error) {
@@ -39,4 +44,12 @@ func (s *InstitutionService) GetInstitutions() ([]models.Institution, error) {
 	}
 
 	return institutions, nil
+}
+
+func (s *InstitutionService) GetInstitutionBySlug(slug string) (models.Institution, error) {
+	var institution models.Institution
+
+	err := s.collection.FindOne(context.Background(), bson.M{"slug": slug}).Decode(&institution)
+
+	return institution, err
 }

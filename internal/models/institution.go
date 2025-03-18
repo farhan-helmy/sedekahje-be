@@ -17,5 +17,6 @@ type Institution struct {
 	QRImage          string              `bson:"qrImage,omitempty" json:"qrImage,omitempty"`
 	QRContent        string              `bson:"qrContent,omitempty" json:"qrContent,omitempty" validate:"required"`
 	SupportedPayment []string            `bson:"supportedPayment,omitempty" json:"supportedPayment,omitempty" validate:"required"`
-	Coords           []float64           `bson:"coords,omitempty" json:"coords,omitempty" validate:"required"`
+	Coords           []float64           `bson:"coords,omitempty" json:"coords,omitempty" validate:"required,min=2,max=2"`
+	Slug             string              `bson:"slug,omitempty" json:"slug,omitempty" validate:"required"`
 }

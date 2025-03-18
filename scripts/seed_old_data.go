@@ -8,7 +8,9 @@ import (
 
 	"github.com/farhan-helmy/sedekahje-be/internal/db"
 	"github.com/farhan-helmy/sedekahje-be/internal/models"
+	"github.com/farhan-helmy/sedekahje-be/internal/utils"
 	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 func main() {
@@ -37,7 +39,13 @@ func main() {
 
 	collection := client.Database("sedekahje").Collection("institutions")
 
+	if _, err := collection.DeleteMany(context.Background(), bson.M{}); err != nil {
+		log.Fatal("Error during DeleteMany(): ", err)
+	}
+
 	for _, v := range institutions {
+		v.Slug = utils.Slugify(v.Name)
+
 		_, err := collection.InsertOne(context.Background(), v)
 		if err != nil {
 			log.Fatal("Error during InsertOne(): ", err)

@@ -27,6 +27,7 @@ func SetupRoutes(router *mux.Router, client *mongo.Client) {
 
 	api.HandleFunc("/institutions", getAllInstitutions(institutionService)).Methods("GET")
 	api.HandleFunc("/institutions", createInstitution(institutionService)).Methods("POST")
+	api.HandleFunc("/institutions/{slug}", getInstitutionBySlug(institutionService)).Methods("GET")
 }
 
 func getAllInstitutions(institutionService *services.InstitutionService) http.HandlerFunc {
@@ -56,12 +57,30 @@ func createInstitution(institutionService *services.InstitutionService) http.Han
 		}
 
 		if err := validate.Struct(institution); err != nil {
-			// Return validation errors
-			errs := err.(validator.ValidationErrors)
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(map[string]string{"error": errs.Error()})
+			utils.RespondWithValidationErrors(w, err)
 			return
 		}
+
+		if err := institutionService.CreateInstitution(institution); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		json.NewEncoder(w).Encode(institution)
+	}
+}
+
+func getInstitutionBySlug(institutionService *services.InstitutionService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		slug := mux.Vars(r)["slug"]
+
+		institution, err := institutionService.GetInstitutionBySlug(slug)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+
+		w.WriteHeader(http.StatusOK)
 
 		json.NewEncoder(w).Encode(institution)
 	}
