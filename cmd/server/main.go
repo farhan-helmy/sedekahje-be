@@ -47,6 +47,6 @@ func main() {
 	}
 
 	// Start server
-	log.Println("Server running on :3000")
-	log.Fatal(http.ListenAndServe(":3000", httpRateLimiter.RateLimit(router)))
+	log.Println("Server running on :8080")
+	log.Fatal(http.ListenAndServe(":8080", httpRateLimiter.RateLimit(router)))
 }
