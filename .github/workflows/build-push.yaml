@@ -1,0 +1,16 @@
+name: Build and Push Docker Image
+on:
+  push:
+    branches: [ main ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+    - uses: actions/checkout@v4
+    - name: Log in to GHCR
+      run: echo "${{ secrets.CR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+    - name: Build and Push
+      run: |
+        docker build -t ghcr.io/${{ github.actor }}/sedekahje-be:latest .
+        docker push ghcr.io/${{ github.actor }}/sedekahje-be:latest
