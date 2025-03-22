@@ -25,3 +25,5 @@ spec:
               secretKeyRef:
                 name: db-secret
                 key: mongo-uri
+      imagePullSecrets:
+      - name: ghcr-secret
