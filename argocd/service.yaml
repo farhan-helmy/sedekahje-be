@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sedekahje-be-svc
+  namespace: sedekahjer
+spec:
+  type: NodePort  # You may want to use LoadBalancer for external access if supported
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+  selector:
+    app: sedekahje-be

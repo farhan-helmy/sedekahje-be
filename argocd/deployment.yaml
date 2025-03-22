@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sedekahje-be
+  namespace: sedekahjer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sedekahje-be
+  template:
+    metadata:
+      labels:
+        app: sedekahje-be
+    spec:
+      containers:
+      - name: sedekahje-be
+        image: ghcr.io/farhan-helmy/sedekahje-be:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        env:
+          - name: MONGO_URI
+            valueFrom:
+              secretKeyRef:
+                name: db-secret
+                key: mongo-uri
