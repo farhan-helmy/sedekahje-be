@@ -18,7 +18,7 @@ func NewInstitutionService(client *mongo.Client) *InstitutionService {
 	return &InstitutionService{collection}
 }
 
-func (s *InstitutionService) CreateInstitution(institution models.Institution) error {
+func (s *InstitutionService) CreateInstitution(institution *models.Institution) error {
 	if _, err := s.collection.InsertOne(context.Background(), institution); err != nil {
 		return err
 	}
@@ -32,7 +32,6 @@ func (s *InstitutionService) GetInstitutions() ([]models.Institution, error) {
 	var institutions []models.Institution
 
 	cursor, err := s.collection.Find(context.Background(), bson.M{})
-
 	if err != nil {
 		return nil, err
 	}
@@ -46,10 +45,10 @@ func (s *InstitutionService) GetInstitutions() ([]models.Institution, error) {
 	return institutions, nil
 }
 
-func (s *InstitutionService) GetInstitutionBySlug(slug string) (models.Institution, error) {
+func (s *InstitutionService) GetInstitutionBySlug(slug string) (*models.Institution, error) {
 	var institution models.Institution
 
 	err := s.collection.FindOne(context.Background(), bson.M{"slug": slug}).Decode(&institution)
 
-	return institution, err
+	return &institution, err
 }
