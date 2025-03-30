@@ -61,7 +61,7 @@ func createInstitution(institutionService *services.InstitutionService) http.Han
 			return
 		}
 
-		if err := institutionService.CreateInstitution(institution); err != nil {
+		if err := institutionService.CreateInstitution(&institution); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
