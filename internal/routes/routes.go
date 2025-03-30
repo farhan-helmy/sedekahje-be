@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/farhan-helmy/sedekahje-be/internal/errors"
 	"github.com/farhan-helmy/sedekahje-be/internal/models"
 	"github.com/farhan-helmy/sedekahje-be/internal/services"
 	"github.com/farhan-helmy/sedekahje-be/internal/utils"
@@ -31,12 +32,16 @@ func SetupRoutes(router *mux.Router, client *mongo.Client) {
 }
 
 func getAllInstitutions(institutionService *services.InstitutionService) http.HandlerFunc {
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		institutions, err := institutionService.GetInstitutions()
-
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			if err == mongo.ErrNilDocument {
+				errors.Render(w, errors.ErrEmptyInstitution, err)
+				return
+			}
+
+			errors.Render(w, err, nil)
+			return
 		}
 
 		w.WriteHeader(http.StatusOK)
@@ -52,7 +57,7 @@ func createInstitution(institutionService *services.InstitutionService) http.Han
 		var institution models.Institution
 
 		if err := json.NewDecoder(r.Body).Decode(&institution); err != nil {
-			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			errors.Render(w, err, nil)
 			return
 		}
 
@@ -62,7 +67,7 @@ func createInstitution(institutionService *services.InstitutionService) http.Han
 		}
 
 		if err := institutionService.CreateInstitution(&institution); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			errors.Render(w, err, nil)
 			return
 		}
 
@@ -75,9 +80,13 @@ func getInstitutionBySlug(institutionService *services.InstitutionService) http.
 		slug := mux.Vars(r)["slug"]
 
 		institution, err := institutionService.GetInstitutionBySlug(slug)
-
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			if err == mongo.ErrNoDocuments {
+				errors.Render(w, errors.ErrInstitutionNotFound, err)
+				return
+			}
+			errors.Render(w, err, nil)
+			return
 		}
 
 		w.WriteHeader(http.StatusOK)
