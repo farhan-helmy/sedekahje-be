@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: sedekahje-be
   namespace: sedekahjer
+  annotations:
+    app.kubernetes.io/version: "latest"  # This will be updated by GitHub Actions
 spec:
   replicas: 1
   selector:

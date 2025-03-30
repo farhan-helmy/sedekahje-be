@@ -2,6 +2,12 @@ name: Build and Push Docker Image
 on:
   push:
     branches: [ main ]
+
+# Add permissions for writing to the repository
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -10,7 +16,22 @@ jobs:
     - uses: actions/checkout@v4
     - name: Log in to GHCR
       run: echo "${{ secrets.CR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+    - name: Generate version tag
+      id: version
+      run: echo "version=$(date +'%Y%m%d.%H%M%S')" >> $GITHUB_OUTPUT
     - name: Build and Push
       run: |
-        docker build -t ghcr.io/${{ github.actor }}/sedekahje-be:latest .
+        docker build -t ghcr.io/${{ github.actor }}/sedekahje-be:latest -t ghcr.io/${{ github.actor }}/sedekahje-be:${{ steps.version.outputs.version }} .
         docker push ghcr.io/${{ github.actor }}/sedekahje-be:latest
+        docker push ghcr.io/${{ github.actor }}/sedekahje-be:${{ steps.version.outputs.version }}
+    - name: Update deployment file
+      run: |
+        sed -i "s|image: ghcr.io/farhan-helmy/sedekahje-be:.*|image: ghcr.io/farhan-helmy/sedekahje-be:${{ steps.version.outputs.version }}|g" argocd/deployment.yaml
+        sed -i "s|app.kubernetes.io/version: \".*\"|app.kubernetes.io/version: \"${{ steps.version.outputs.version }}\"|g" argocd/deployment.yaml
+    - name: Commit and push changes
+      run: |
+        git config --global user.name 'GitHub Actions'
+        git config --global user.email 'actions@github.com'
+        git add argocd/deployment.yaml
+        git commit -m "Update image to ${{ steps.version.outputs.version }}"
+        git push
