@@ -1,0 +1,8 @@
+linters-settings:
+  govet:
+    enable:
+      - fieldalignment
+linters:
+  enable:
+    - revive
+    - govet

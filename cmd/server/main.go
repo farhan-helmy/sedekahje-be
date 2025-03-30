@@ -10,6 +10,7 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"github.com/common-nighthawk/go-figure"
 	"github.com/farhan-helmy/sedekahje-be/internal/config"
 	"github.com/farhan-helmy/sedekahje-be/internal/db"
 	"github.com/farhan-helmy/sedekahje-be/internal/routes"
@@ -88,6 +89,8 @@ func main() {
 
 	// Start the server in a goroutine so that it doesn't block
 	go func() {
+		myFigure := figure.NewFigure("Sedekahje", "", true)
+		myFigure.Print()
 		log.Println("Server running on :8080")
 		if err := apiServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("ListenAndServe(): %s", err)
