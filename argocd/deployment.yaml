@@ -4,7 +4,7 @@ metadata:
   name: sedekahje-be
   namespace: sedekahjer
   annotations:
-    app.kubernetes.io/version: "latest"  # This will be updated by GitHub Actions
+    app.kubernetes.io/version: "20250330.163816"  # This will be updated by GitHub Actions
 spec:
   replicas: 1
   selector:
@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: sedekahje-be
-        image: ghcr.io/farhan-helmy/sedekahje-be:latest
+        image: ghcr.io/farhan-helmy/sedekahje-be:20250330.163816
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
