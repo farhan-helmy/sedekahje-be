@@ -24,7 +24,7 @@ func gracefulShutdown(apiServer *http.Server, done chan bool) {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	// Listen for the interrupt signal.
+	// Listen for the interrupt signal. test update container
 	<-ctx.Done()
 
 	log.Println("shutting down gracefully, press Ctrl+C again to force")
